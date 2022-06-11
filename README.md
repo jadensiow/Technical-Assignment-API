@@ -1,67 +1,70 @@
-# API Engineer
+# Getting Started with Create React App
 
-## Technical Assignment
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-Make sure to document your technical decisions and assumptions you have made during this technical assignment. Do not forget to add instructions on how to build and run the code.
+## Available Scripts
 
-In Ensign, we value not just your output, but your critical thinking as well. So do put in your best effort in designing the application in a way that the code is clean, easily understood and design of the whole application is well thought of.
+In the project directory, you can run:
 
-Programming language that can be used
+### `npm start`
 
-- Javascript
-- Ruby
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-You can choose to use any framework that is based on the language above.
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-### Assignment 1
+### `npm test`
 
-Write a JavaScript program that uses the [SpaceX API](https://github.com/r-spacex/SpaceX-API/blob/master/docs/launchpads/v4/one.md).
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-This program has 2 functions available. Confirm both outcomes by writing meaningful unit tests.
+### `npm run build`
 
-#### Function 1
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-This function accepts an `id` of a `launchpad` as an argument, and returns information about failed `launches` (desc) in following format:
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-```js
-// launchpad id 5e9e4502f5090995de566f86
-{
-   "launchpad":"Kwajalein Atoll",
-   "all_failures":[
-      {
-         "name":"Trailblazer",
-         "failures":[
-            "residual stage-1 thrust led to collision between stage 1 and stage 2"
-         ]
-      },
-      {
-         "name":"DemoSat",
-         "failures":[
-            "harmonic oscillation leading to premature engine shutdown"
-         ]
-      },
-      {
-         "name":"FalconSat",
-         "failures":[
-            "merlin engine failure"
-         ]
-      }
-   ]
-}
-```
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-Try to only retrieve and process launches for the given `launchpad`
+### `npm run eject`
 
-#### Function 2
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-Fetch all starlink satellites using [this query](https://github.com/r-spacex/SpaceX-API/blob/master/docs/starlink/v4/all.md) and store the response in (runtime) memory.
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Afterwards, write a function that transforms this response data.
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-The return value of this function should make it possible to look up all starlink satellites launched on a specific `year`, `month`, and/or `date` in a performant way.
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-Make it as convenient as possible to look up following values from the return value:
+## Learn More
 
-- starlinks launched in year 2019
-- starlinks launched on May 5th 2019
-- starlinks launched in June 2020
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
