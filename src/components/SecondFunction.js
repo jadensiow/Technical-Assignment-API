@@ -8,7 +8,7 @@ import Loader from "./Loader/Loader";
 
 let satellites;
 
-const SecondComponent = () => {
+const SecondFunction = () => {
   // [selectedYear, selectedMonth, selectedDay]
   const [selectedValue, setSelectedValue] = useState({
     year: 0,
@@ -176,4 +176,4 @@ const SecondComponent = () => {
   );
 };
 
-export default SecondComponent;
+export default SecondFunction;
