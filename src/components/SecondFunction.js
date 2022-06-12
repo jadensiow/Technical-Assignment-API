@@ -3,7 +3,7 @@ import {
   getSatellitesData,
   processSatellitesData,
   querySatellitesData,
-} from "../Helpers/helpers";
+} from "../Helpers/Helpers";
 import Loader from "./Loader/Loader";
 
 let satellites;
@@ -19,6 +19,7 @@ const SecondFunction = (props) => {
 
   const [page, setPage] = useState(1);
 
+  // Date dropdown
   const [selects, setSelects] = useState(() => ({
     year: !storeQueryDataOnParent
       ? []
@@ -33,10 +34,13 @@ const SecondFunction = (props) => {
     day: new Array(31).fill(0).map((_, i) => i),
   }));
 
+  // Loading
   const [apiResponse, setApiResponse] = useState({
     loading: !storeQueryDataOnParent,
     error: null,
   });
+
+  // Data to be shown on the page
   const [userRequestedData, setUserRequestedData] = useState("");
 
   const pageSize = useRef(20);
@@ -72,7 +76,6 @@ const SecondFunction = (props) => {
   useEffect(() => {
     if (storeQueryDataOnParent !== null) {
       satellites = storeQueryDataOnParent.satellites;
-      setApiResponse({ loading: false, error: null });
       return;
     } else {
       (async () => {
@@ -99,7 +102,7 @@ const SecondFunction = (props) => {
       <h3>Function 2</h3>
       <p>
         Input a date and will return the starlink satellites launched. If zero
-        is input for month or date, it represents everything is selected
+        is input, it represents everything is selected.
       </p>
       <div
         style={{

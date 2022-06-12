@@ -4,6 +4,7 @@ import SecondFunction from "./components/SecondFunction";
 
 const App = () => {
   const [tabNumber, setTabNumber] = useState(1);
+  const [storeQueryDataOnParent, setStoreQueryDataOnParent] = useState(null);
 
   return (
     <div className="App">
@@ -13,7 +14,16 @@ const App = () => {
         <button onClick={() => setTabNumber(1)}>Function 1</button>
         <button onClick={() => setTabNumber(2)}>Function 2</button>
 
-        <div>{tabNumber === 1 ? <FirstFunction /> : <SecondFunction />}</div>
+        <div>
+          {tabNumber === 1 ? (
+            <FirstFunction />
+          ) : (
+            <SecondFunction
+              setStoreQueryDataOnParent={setStoreQueryDataOnParent}
+              storeQueryDataOnParent={storeQueryDataOnParent}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

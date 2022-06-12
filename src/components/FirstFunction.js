@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import axios from "axios";
 import Loader from "./Loader/Loader";
-import { processLaunchFailures } from "../Helpers/helpers";
+import { processLaunchFailures } from "../Helpers/Helpers";
 
 export const FirstFunction = () => {
   // Search bar
@@ -85,7 +85,7 @@ export const FirstFunction = () => {
       >
         <h3>Function 1</h3>
         <p>
-          Search for an id of a launchpad and the result will return the failed
+          Search for an Id of a launchpad and the result will return the failed
           launches.
         </p>
         <form onSubmit={handleSubmit}>
