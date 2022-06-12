@@ -14,7 +14,7 @@ const App = () => {
         <button onClick={() => setTabNumber(2)}>Function 2</button>
 
         <div>{tabNumber === 1 ? <FirstFunction /> : <SecondFunction />}</div>
-      </div>{" "}
+      </div>
     </div>
   );
 };

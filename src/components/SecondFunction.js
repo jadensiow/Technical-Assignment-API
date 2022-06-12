@@ -1,87 +1,58 @@
-import React, { useCallback, useEffect, useState } from "react";
-import axios from "axios";
-import { getDateString } from "../helpers/helpers";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  getSatellitesData,
+  processSatellitesData,
+  querySatellitesData,
+} from "../Helpers/helpers";
+import Loader from "./Loader/Loader";
 
-const satellites = {
-  byDate: {},
-  byYear: {},
-};
-const SecondFunction = () => {
+let satellites;
+
+const SecondComponent = () => {
   // [selectedYear, selectedMonth, selectedDay]
   const [selectedValue, setSelectedValue] = useState({
     year: 0,
     month: 0,
     day: 0,
   });
+
+  const [page, setPage] = useState(1);
+
   const [selects, setSelects] = useState(() => ({
     year: [],
     month: new Array(13).fill(0).map((_, i) => i),
     day: new Array(31).fill(0).map((_, i) => i),
   }));
+
   const [apiResponse, setApiResponse] = useState({
     loading: true,
     error: null,
   });
   const [userRequestedData, setUserRequestedData] = useState("");
-  const getData = useCallback(() => {
-    const { year, month, day } = selectedValue;
 
-    let data;
+  const pageSize = useRef(20);
+  const numPages = useRef(0);
 
-    if (year !== 0 && month !== 0 && day !== 0) {
-      // specific date selected
-      data = satellites.byDate[getDateString(selectedValue)];
-    } else if (year !== 0 && month + day === 0) {
-      // specific year selected
-      data = satellites.byYear[selectedValue.year];
-    } else if (day === 0 && year !== 0 && month !== 0) {
-      // some combination of year + month, like 2020-07
-      data = satellites.byYear[year][month];
+  const queryData = useCallback(() => {
+    const data = querySatellitesData(selectedValue, satellites);
+
+    if (data && typeof data !== "string") {
+      numPages.current =
+        Math.floor(data.length / pageSize.current) +
+        (data.length < pageSize.current ? 1 : 0);
     }
+
+    setPage(1);
     setUserRequestedData(data || "Nothing Found");
   }, [selectedValue]);
+
   const callApi = useCallback(async () => {
-    const { data } = await axios.get("https://api.spacexdata.com/v4/starlink");
-    let minYear = Number.POSITIVE_INFINITY;
-    let maxYear = Number.NEGATIVE_INFINITY;
-    for (const satellite of data) {
-      const {
-        spaceTrack: { LAUNCH_DATE: launchDate },
-      } = satellite;
-      // store using year, month and the entire date
-      if (!launchDate) {
-        continue;
-      }
-      const [year, month] = launchDate
-        .split("-")
-        .map((d) => Number.parseInt(d));
-      if (year < minYear) {
-        minYear = year;
-      }
-      if (year > maxYear) {
-        maxYear = year;
-      }
-      if (year in satellites.byYear) {
-        if (month in satellites.byYear[year]) {
-          // already added a bunch of satellites for this year
-          satellites.byYear[year][month].push(satellite);
-        } else {
-          satellites.byYear[year][month] = [];
-          satellites.byYear[year][month].push(satellite);
-        }
-      } else {
-        satellites.byYear[year] = {
-          [month]: [],
-        };
-        satellites.byYear[year][month].push(satellite);
-      }
-      if (launchDate in satellites.byDate) {
-        satellites.byDate[launchDate].push(satellite);
-      } else {
-        satellites.byDate[launchDate] = [satellite];
-      }
-    }
-    console.log(satellites);
+    const data = await getSatellitesData();
+
+    const { minYear, maxYear, satellites: s } = processSatellitesData(data);
+
+    satellites = s;
+
     setSelects((old) => ({
       ...old,
       year: new Array(maxYear - minYear + 2)
@@ -89,6 +60,7 @@ const SecondFunction = () => {
         .map((_, i) => (i === 0 ? 0 : minYear - 1 + i)),
     }));
   }, []);
+
   useEffect(() => {
     (async () => {
       try {
@@ -98,10 +70,8 @@ const SecondFunction = () => {
         setApiResponse({ loading: false, error: error.message });
       }
     })();
-  }, []);
-  if (apiResponse.loading) {
-    return <div>Loading....</div>;
-  }
+  }, [callApi]);
+
   return (
     <div
       style={{
@@ -112,45 +82,98 @@ const SecondFunction = () => {
         flexDirection: "column",
       }}
     >
+      <h3>Function 2</h3>
+      <p>
+        Input a date and will return the starlink satellites launched. If zero
+        is input for month or date, it represent everything is selected
+      </p>
       <div
         style={{
           display: "flex",
-          width: "350px",
-          justifyContent: "space-between",
+          width: "400px",
+          justifyContent: apiResponse.loading ? "center" : "space-between",
         }}
       >
-        {Object.entries(selects).map(([key, value]) => {
-          return (
-            <select
-              style={{
-                width: "75px",
-                textAlign: "center",
-                boxSizing: "border-box",
-              }}
-              key={key}
-              onChange={(e) =>
-                setSelectedValue((old) => ({
-                  ...old,
-                  [key]: Number.parseInt(e.target.value),
-                }))
-              }
-            >
-              {value.map((val) => (
-                <option key={val}>{val}</option>
-              ))}
-            </select>
-          );
-        })}
-        <button onClick={getData}>Get Data</button>
+        {apiResponse.loading ? (
+          <Loader />
+        ) : (
+          <div style={{ display: "flex", alignItems: "flex-end" }}>
+            {Object.entries(selects).map(([key, value]) => {
+              return (
+                <div key={key}>
+                  <label>{key.toUpperCase()}</label>
+                  <select
+                    style={{
+                      width: "75px",
+                      textAlign: "center",
+                      boxSizing: "border-box",
+                      marginTop: "0.5rem",
+                    }}
+                    onChange={(e) =>
+                      setSelectedValue((old) => ({
+                        ...old,
+                        [key]: Number.parseInt(e.target.value),
+                      }))
+                    }
+                  >
+                    {value.map((val) => (
+                      <option key={val}>{val}</option>
+                    ))}
+                  </select>
+                </div>
+              );
+            })}
+            <div>
+              <button onClick={queryData}>Get Data</button>
+            </div>
+          </div>
+        )}
       </div>
+
       <div style={{ marginTop: "3rem" }}>
         <pre>
           {typeof userRequestedData === "string"
             ? userRequestedData
-            : JSON.stringify(userRequestedData, null, 4)}
+            : JSON.stringify(
+                userRequestedData.slice(
+                  (page - 1) * pageSize.current,
+                  page * pageSize.current
+                ),
+                null,
+                4
+              )}
         </pre>
       </div>
+
+      {typeof userRequestedData !== "string" && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-around",
+            width: "100%",
+          }}
+        >
+          <button
+            style={{ width: "70px" }}
+            onClick={() => setPage((old) => (old - 1 > 0 ? old - 1 : old))}
+          >
+            Previous
+          </button>
+          <p>
+            {page} / {Math.ceil(numPages.current)}
+          </p>
+          <button
+            style={{ width: "70px" }}
+            onClick={() =>
+              setPage((old) => (old + 1 <= numPages.current ? old + 1 : old))
+            }
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
-export default SecondFunction;
+
+export default SecondComponent;

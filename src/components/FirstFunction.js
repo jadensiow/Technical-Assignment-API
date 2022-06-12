@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import axios from "axios";
-import Loader from "./Loader";
-import { processLaunchFailures } from "../helpers/helpers";
+import Loader from "./Loader/Loader";
+import { processLaunchFailures } from "../Helpers/helpers";
 
 export const FirstFunction = () => {
   // Search bar
@@ -38,11 +38,10 @@ export const FirstFunction = () => {
         );
         // To sort data into actual data
         const actualData = {
-          name: "",
+          launchpad: "",
           all_failures: [],
         };
         processLaunchFailures(actualData, data);
-
         setApiResponse({ loading: false, error: null });
         setResults(actualData);
       } catch (error) {
@@ -86,7 +85,7 @@ export const FirstFunction = () => {
       >
         <h3>Function 1</h3>
         <p>
-          Search for an id of a launcpad and the result will return the failed
+          Search for an id of a launchpad and the result will return the failed
           launches.
         </p>
         <form onSubmit={handleSubmit}>
