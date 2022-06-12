@@ -1,67 +1,157 @@
-# API Engineer
+# Description
 
-## Technical Assignment
+This program has 2 functions available with unit tests. The details are included in Assignment.md
 
-Make sure to document your technical decisions and assumptions you have made during this technical assignment. Do not forget to add instructions on how to build and run the code.
+```
+# Install
 
-In Ensign, we value not just your output, but your critical thinking as well. So do put in your best effort in designing the application in a way that the code is clean, easily understood and design of the whole application is well thought of.
+To run this, npm is required
 
-Programming language that can be used
+```
 
-- Javascript
-- Ruby
+npm install
 
-You can choose to use any framework that is based on the language above.
+````
 
-### Assignment 1
+After completed, just do a npm start
 
-Write a JavaScript program that uses the [SpaceX API](https://github.com/r-spacex/SpaceX-API/blob/master/docs/launchpads/v4/one.md).
+# Technical decisions
 
-This program has 2 functions available. Confirm both outcomes by writing meaningful unit tests.
+## Function 1
 
-#### Function 1
+When the First Component loads, it will take in the id from the submitted search and query for the results. The results searched are the details of the launches sorted in a descending order of their launch time.
 
-This function accepts an `id` of a `launchpad` as an argument, and returns information about failed `launches` (desc) in following format:
+The data received is unorganised and it is sent to `processLaunchFailures` function for processing.
 
-```js
-// launchpad id 5e9e4502f5090995de566f86
-{
-   "launchpad":"Kwajalein Atoll",
-   "all_failures":[
-      {
-         "name":"Trailblazer",
-         "failures":[
-            "residual stage-1 thrust led to collision between stage 1 and stage 2"
-         ]
+After the data is processed and is in the required format, it is displayed
+
+> ### Axios post of the query
+
+The data is queried by sending the post request in the format below. We populate launches beforehand in order to not query all the launches separately.
+
+```ts
+const { data } = await axios.post(
+  "https://api.spacexdata.com/v4/launchpads/query",
+  {
+    query: {
+      // Search is the submitted Id to query for
+      _id: search,
+    },
+    options: {
+      // Populate is to retrieve the launches information
+      populate: ["launches"],
+      // Sort according to descending date
+      sort: {
+        date_utc: "descending",
       },
-      {
-         "name":"DemoSat",
-         "failures":[
-            "harmonic oscillation leading to premature engine shutdown"
-         ]
-      },
-      {
-         "name":"FalconSat",
-         "failures":[
-            "merlin engine failure"
-         ]
-      }
-   ]
+    },
+  }
+);
+````
+
+<!-- The query result is return as an object. -->
+
+> ### Function `processLaunchFailures`
+
+This function is taking in 2 object parameters. The first is an object that will be populated with the processed and formatted data (`actualData`) and the second is the data from the query (`data`).
+
+The name of the launch is first copied into `actualData`. Then we loop over the launches array and only add the rquired fields into `actualData`.
+
+## Function 1 test
+
+A mock post result is written and it will go through the function `processLaunchFailures`. This is to ensure the result will be copied correctly into the the empty format of the variables that need to be shown on the page (`actualData`).
+A mock page result is shown and compared with `actualData`.
+
+## Function 2
+
+When the Second Component first loads, all the starlink data is queried and returned by the `getSatellitesData` function.
+
+The data returned is unorganised, and it is sent to the `processSatelliteData` function for processing.
+
+Data can then be queried by calling the `querySatelliteData` function.
+
+> ### Function `processSatelliteData`
+
+Since we want constant time lookups, that unprocessed satellite data is stored in an object called `satellites` which has the following type:
+
+```ts
+interface satellites {
+  // stores all the satellites by year, with the year as key and an array
+  // of satellites launched in that year as value
+  // { 2018: [<All satellites launched in 2018>], ... }
+  byYear: {};
+
+  // stores all satellites by a year-month combination
+  // { '2018-1': [<All satellites launched in January 2018>], ... }
+  byMonth: {};
+
+  // stores all satellites launched on each date for constant time lookup
+  // { '2018-1-12': [<All satellites launched on 12th January 2018>] }
+  byDate: {};
 }
 ```
 
-Try to only retrieve and process launches for the given `launchpad`
+The above object is returned to the calling function.
 
-#### Function 2
+An HTML `<select></select>` is shown on the interface in order for the user and us to be able to unambiguously determine what data is requested. Here user can select the Year, Month, and Date that they wish to get the data for.
 
-Fetch all starlink satellites using [this query](https://github.com/r-spacex/SpaceX-API/blob/master/docs/starlink/v4/all.md) and store the response in (runtime) memory.
+Since we need a year range to show on the interface, the `processSatelliteData` also returns the earliest year a satellite was launched and the latest year a satellite was launched.
 
-Afterwards, write a function that transforms this response data.
+> ### Function `querySatellitesData`
 
-The return value of this function should make it possible to look up all starlink satellites launched on a specific `year`, `month`, and/or `date` in a performant way.
+This function is fed the user's input in the following format:
 
-Make it as convenient as possible to look up following values from the return value:
+```ts
+{
+  year: number;
+  month: number;
+  day: number;
+}
+```
 
-- starlinks launched in year 2019
-- starlinks launched on May 5th 2019
-- starlinks launched in June 2020
+1. `year` can range from `minYear` and `maxYear`, where `minYear` is the earliest year a satellite was launched and `maxYear` is the latest year a satellite was launched.
+
+2. `month` ranges from `1-12`
+
+3. `day` ranges from `1-31`
+
+Each input can also be 0, which would mean that the option is not selected.
+
+    Query Examples
+
+    1. year = 2018, month = 12, day = 1
+    Get all satellites launched on 1st December 2018
+
+    2. year = 2018, month = 3, day = 0
+    Get all satellites launched in March 2018
+
+    3. year = 2018, month = 0, day = 0
+    Get all satellites launched in 2018
+
+    4. year = 0, month = 3, day = 2
+    Invalid query, as we do not support getting data for each month for every year
+
+Basic result pagination is also implemented as rendering all the data at once is not performant.
+
+## Function 2 test
+
+There are 3 test cases used to test for the 3 different date formats.
+
+    Query Examples
+
+    1. year = 2019, month = 11, day = 11
+    Get all satellites launched on 11th November 2018
+
+    2. year = 2019, month = 11, day = 0
+    Get all satellites launched in November 2019
+
+    3. year = 2019, month = 0, day = 0
+    Get all satellites launched in 2019
+
+Initially get all the satellies data, process it and store it in memory.
+
+Then cases are defined in the format `year-month-day`, `year-month`, `year`
+
+A function `getStarlinkDataFromQuery` is used to retrieve a the data for a given format. Since the `launchDate` field is of type `String`, `regex` query is used to match the correct substring.
+
+The test is successful if the lenght of the output given by our function is equal to the length of the ouput directly queried from the API.
