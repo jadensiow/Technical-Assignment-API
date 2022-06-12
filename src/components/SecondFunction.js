@@ -8,24 +8,33 @@ import Loader from "./Loader/Loader";
 
 let satellites;
 
-const SecondFunction = () => {
+const SecondFunction = (props) => {
   // [selectedYear, selectedMonth, selectedDay]
   const [selectedValue, setSelectedValue] = useState({
     year: 0,
     month: 0,
     day: 0,
   });
+  const { storeQueryDataOnParent, setStoreQueryDataOnParent } = props;
 
   const [page, setPage] = useState(1);
 
   const [selects, setSelects] = useState(() => ({
-    year: [],
+    year: !storeQueryDataOnParent
+      ? []
+      : new Array(
+          storeQueryDataOnParent.maxYear - storeQueryDataOnParent.minYear + 2
+        )
+          .fill(0)
+          .map((_, i) =>
+            i === 0 ? 0 : storeQueryDataOnParent.minYear - 1 + i
+          ),
     month: new Array(13).fill(0).map((_, i) => i),
     day: new Array(31).fill(0).map((_, i) => i),
   }));
 
   const [apiResponse, setApiResponse] = useState({
-    loading: true,
+    loading: !storeQueryDataOnParent,
     error: null,
   });
   const [userRequestedData, setUserRequestedData] = useState("");
@@ -48,10 +57,9 @@ const SecondFunction = () => {
 
   const callApi = useCallback(async () => {
     const data = await getSatellitesData();
-
     const { minYear, maxYear, satellites: s } = processSatellitesData(data);
 
-    satellites = s;
+    setStoreQueryDataOnParent({ minYear, maxYear, satellites: s });
 
     setSelects((old) => ({
       ...old,
@@ -59,18 +67,24 @@ const SecondFunction = () => {
         .fill(0)
         .map((_, i) => (i === 0 ? 0 : minYear - 1 + i)),
     }));
-  }, []);
+  }, [setStoreQueryDataOnParent]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        await callApi();
-        setApiResponse({ loading: false, error: null });
-      } catch (error) {
-        setApiResponse({ loading: false, error: error.message });
-      }
-    })();
-  }, [callApi]);
+    if (storeQueryDataOnParent !== null) {
+      satellites = storeQueryDataOnParent.satellites;
+      setApiResponse({ loading: false, error: null });
+      return;
+    } else {
+      (async () => {
+        try {
+          await callApi();
+          setApiResponse({ loading: false, error: null });
+        } catch (error) {
+          setApiResponse({ loading: false, error: error.message });
+        }
+      })();
+    }
+  }, [callApi, storeQueryDataOnParent]);
 
   return (
     <div
@@ -85,7 +99,7 @@ const SecondFunction = () => {
       <h3>Function 2</h3>
       <p>
         Input a date and will return the starlink satellites launched. If zero
-        is input for month or date, it represent everything is selected
+        is input for month or date, it represents everything is selected
       </p>
       <div
         style={{
@@ -101,7 +115,9 @@ const SecondFunction = () => {
             {Object.entries(selects).map(([key, value]) => {
               return (
                 <div key={key}>
-                  <label>{key.toUpperCase()}</label>
+                  <label>
+                    {key[0].toUpperCase() + key.slice(1).toLowerCase()}
+                  </label>
                   <select
                     style={{
                       width: "75px",
