@@ -8,7 +8,6 @@ To run this, npm is required
 
 ```
 npm install
-
 ```
 
 After completed, just do a npm start
