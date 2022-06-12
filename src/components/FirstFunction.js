@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import axios from "axios";
 import Loader from "./Loader/Loader";
-import { processLaunchFailures } from "../Helpers/Helpers";
+import { processLaunchFailures } from "../helpers/helpers";
 
 export const FirstFunction = () => {
   // Search bar

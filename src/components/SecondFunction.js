@@ -3,7 +3,7 @@ import {
   getSatellitesData,
   processSatellitesData,
   querySatellitesData,
-} from "../Helpers/Helpers";
+} from "../helpers/helpers";
 import Loader from "./Loader/Loader";
 
 let satellites;

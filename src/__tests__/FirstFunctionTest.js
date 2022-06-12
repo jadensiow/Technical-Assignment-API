@@ -1,4 +1,4 @@
-import { processLaunchFailures } from "../Helpers/Helpers";
+import { processLaunchFailures } from "../helpers/helpers";
 
 describe("Test first function", () => {
   test("Ensure data is processed correctly from the POST request", async () => {

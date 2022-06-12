@@ -2,7 +2,7 @@ import {
   getSatellitesData,
   processSatellitesData,
   querySatellitesData,
-} from "../Helpers/Helpers";
+} from "../helpers/helpers";
 import axios from "axios";
 
 jest.setTimeout(30_000);
