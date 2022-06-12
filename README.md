@@ -2,16 +2,14 @@
 
 This program has 2 functions available with unit tests. The details are included in Assignment.md
 
-```
 # Install
 
 To run this, npm is required
 
 ```
-
 npm install
 
-````
+```
 
 After completed, just do a npm start
 
@@ -47,7 +45,7 @@ const { data } = await axios.post(
     },
   }
 );
-````
+```
 
 <!-- The query result is return as an object. -->
 
