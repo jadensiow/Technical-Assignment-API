@@ -1,6 +1,7 @@
 # Description
 
-This program has 2 functions available with unit tests. The details are included in Assignment.md
+This program has 2 functions available with unit tests. The details are included in Assignment.md\
+The site is deployed on Netlify https://technical-assignment-ensign.netlify.app/
 
 # Install
 
